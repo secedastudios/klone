@@ -1,6 +1,6 @@
 [package]
 name = "klone"
-version = "0.4.0"
+version = "0.4.1"
 edition = "2024"
 description = "Archive and retrieve large media files to a Hetzner Storage Box"
 

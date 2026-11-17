@@ -53,6 +53,8 @@ listen('update-progress', ({ payload }) => {
   $('.text', pill).textContent = pct === null ? `Downloading ${bytes(payload.downloaded)}…` : `Downloading… ${pct}%`;
 });
 $('#update-pill').addEventListener('click', () => state.update && offerUpdate(state.update));
+listen('menu-check-updates', () => checkForUpdates());
+listen('menu-settings', () => go('settings'));
 
 $$('[data-view]').forEach((b) => b.addEventListener('click', () => {
   const v = b.dataset.view;
@@ -147,6 +149,19 @@ function showUpdate(info) {
   pill.disabled = false;
   $('.text', pill).textContent = `Update to ${info.version}`;
   pill.title = `Klone ${info.version} is available (you have ${info.current})`;
+}
+
+/** Klone → Check for Updates…: always answers, like any Mac app. */
+async function checkForUpdates() {
+  try {
+    const u = await invoke('check_update');
+    if (u) { showUpdate(u); offerUpdate(u); return; }
+    modal(`<div class="dialog"><h2>You’re up to date</h2><p>Klone ${esc(state.version)} is the newest version.</p>
+      <div class="actions"><button class="btn primary" data-c="ok">OK</button></div></div>`);
+  } catch (e) {
+    modal(`<div class="dialog"><h2>Couldn’t check for updates</h2><p>${esc(String(e))}</p>
+      <div class="actions"><button class="btn primary" data-c="ok">OK</button></div></div>`);
+  }
 }
 
 function offerUpdate(info) {

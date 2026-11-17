@@ -14,7 +14,7 @@ mod update;
 use std::sync::Arc;
 
 use parking_lot::Mutex;
-use tauri::menu::{Menu, MenuItem, PredefinedMenuItem};
+use tauri::menu::{Menu, MenuEvent, MenuItem, PredefinedMenuItem, Submenu};
 use tauri::tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent};
 use tauri::{ActivationPolicy, AppHandle, Emitter, Manager, PhysicalPosition, RunEvent, WindowEvent};
 use tauri_plugin_notification::NotificationExt;
@@ -34,6 +34,71 @@ pub fn show_main_window(app: &AppHandle) {
     if let Some(p) = app.get_webview_window("popover") {
         let _ = p.hide();
     }
+}
+
+/// Every menu click lands here: the app menu and the tray menu share ids.
+fn on_menu(app: &AppHandle, ev: MenuEvent) {
+    let st = app.state::<AppState>();
+    match ev.id().as_ref() {
+        "open" => show_main_window(app),
+        "check_updates" => {
+            show_main_window(app);
+            let _ = app.emit("menu-check-updates", ());
+        }
+        "pause_all" => st.engine.pause_all(),
+        "resume_all" => st.engine.resume_all(),
+        "settings" => {
+            show_main_window(app);
+            let _ = app.emit("menu-settings", ());
+        }
+        "quit" => app.exit(0),
+        _ => {}
+    }
+}
+
+/// The standard macOS menu bar, with Check for Updates… under About.
+fn app_menu(app: &tauri::App) -> tauri::Result<Menu<tauri::Wry>> {
+    let sep = || PredefinedMenuItem::separator(app);
+    let klone = Submenu::with_items(
+        app,
+        "Klone",
+        true,
+        &[
+            &PredefinedMenuItem::about(app, Some("About Klone"), None)?,
+            &MenuItem::with_id(app, "check_updates", "Check for Updates…", true, None::<&str>)?,
+            &sep()?,
+            &MenuItem::with_id(app, "settings", "Settings…", true, Some("CmdOrCtrl+,"))?,
+            &sep()?,
+            &PredefinedMenuItem::services(app, None)?,
+            &sep()?,
+            &PredefinedMenuItem::hide(app, None)?,
+            &PredefinedMenuItem::hide_others(app, None)?,
+            &PredefinedMenuItem::show_all(app, None)?,
+            &sep()?,
+            &PredefinedMenuItem::quit(app, None)?,
+        ],
+    )?;
+    let edit = Submenu::with_items(
+        app,
+        "Edit",
+        true,
+        &[
+            &PredefinedMenuItem::undo(app, None)?,
+            &PredefinedMenuItem::redo(app, None)?,
+            &sep()?,
+            &PredefinedMenuItem::cut(app, None)?,
+            &PredefinedMenuItem::copy(app, None)?,
+            &PredefinedMenuItem::paste(app, None)?,
+            &PredefinedMenuItem::select_all(app, None)?,
+        ],
+    )?;
+    let window = Submenu::with_items(
+        app,
+        "Window",
+        true,
+        &[&PredefinedMenuItem::minimize(app, None)?, &PredefinedMenuItem::maximize(app, None)?, &sep()?, &PredefinedMenuItem::close_window(app, None)?],
+    )?;
+    Menu::with_items(app, &[&klone, &edit, &window])
 }
 
 fn toggle_popover(app: &AppHandle, rect: tauri::Rect) {
@@ -120,30 +185,24 @@ fn main() {
             let handle = app.handle().clone();
             let last = Arc::new(Mutex::new(Snapshot::default()));
 
+            app.set_menu(app_menu(app)?)?;
+            app.on_menu_event(on_menu);
+
             // ── tray ──
             let open = MenuItem::with_id(app, "open", "Open Klone", true, None::<&str>)?;
+            let check = MenuItem::with_id(app, "check_updates", "Check for Updates…", true, None::<&str>)?;
             let pause = MenuItem::with_id(app, "pause_all", "Pause All Transfers", true, None::<&str>)?;
             let resume = MenuItem::with_id(app, "resume_all", "Resume All Transfers", true, None::<&str>)?;
             let quit = MenuItem::with_id(app, "quit", "Quit Klone", true, Some("CmdOrCtrl+Q"))?;
             let sep = PredefinedMenuItem::separator(app)?;
             let sep2 = PredefinedMenuItem::separator(app)?;
-            let menu = Menu::with_items(app, &[&open, &sep, &pause, &resume, &sep2, &quit])?;
+            let menu = Menu::with_items(app, &[&open, &check, &sep, &pause, &resume, &sep2, &quit])?;
             TrayIconBuilder::with_id(TRAY_ID)
                 .icon(tauri::image::Image::from_bytes(include_bytes!("../icons/tray.png"))?)
                 .icon_as_template(true)
                 .tooltip("Klone")
                 .menu(&menu)
                 .show_menu_on_left_click(false)
-                .on_menu_event(|app, ev| {
-                    let st = app.state::<AppState>();
-                    match ev.id().as_ref() {
-                        "open" => show_main_window(app),
-                        "pause_all" => st.engine.pause_all(),
-                        "resume_all" => st.engine.resume_all(),
-                        "quit" => app.exit(0),
-                        _ => {}
-                    }
-                })
                 .on_tray_icon_event(|tray, ev| {
                     if let TrayIconEvent::Click { button: MouseButton::Left, button_state: MouseButtonState::Up, rect, .. } = ev {
                         toggle_popover(tray.app_handle(), rect);
