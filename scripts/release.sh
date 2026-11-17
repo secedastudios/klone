@@ -77,7 +77,7 @@ print(json.dumps({
   # Tag pushed by `make release` (CI), or created here at HEAD (local fallback).
   local target=()
   git rev-parse -q --verify "refs/tags/$TAG" >/dev/null || target=(--target "$(git rev-parse HEAD)")
-  gh release create "$TAG" --repo "$REPO" "${target[@]}" \
+  gh release create "$TAG" --repo "$REPO" ${target[@]+"${target[@]}"} \
     --title "Klone $VERSION" --notes "$NOTES" "$OUT"/*
   echo "Released $TAG: https://github.com/$REPO/releases/tag/$TAG"
 }
