@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Klone</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="app.js"></script>
+</head>
+<body class="main">
+  <div class="grain" aria-hidden="true"></div>
+
+  <aside class="sidebar">
+    <div class="titlebar-pad" data-tauri-drag-region></div>
+    <div class="brand" data-tauri-drag-region>
+      <svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path class="m3" d="M8 8.6 12 5l4 3.6"/><rect class="m2" x="6.5" y="11.6" width="11" height="3.4" rx="1.4"/><rect class="m1" x="3.5" y="17.4" width="17" height="3.4" rx="1.4"/></svg>
+      <span class="word">klone</span>
+      <span class="tag">vault</span>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-section">
+        <h6>On this Mac</h6>
+        <ul id="libraries" class="nav-list"></ul>
+        <button class="nav-add" id="add-library" type="button">
+          <span class="ico" data-icon="plus"></span>Add a library folder
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <h6>Storage boxes</h6>
+        <ul id="boxes" class="nav-list"></ul>
+      </div>
+
+      <div class="nav-section">
+        <h6>Activity</h6>
+        <ul class="nav-list">
+          <li><button class="nav-item" data-view="transfers" type="button">
+            <span class="ico" data-icon="stack"></span>
+            <span class="label">Transfers</span>
+            <span class="count" id="transfer-count" hidden></span>
+          </button></li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="sidebar-foot">
+      <button class="update-pill" id="update-pill" type="button" hidden>
+        <span class="ico" data-icon="up"></span><span class="text"></span>
+      </button>
+      <button class="nav-item" data-view="settings" type="button">
+        <span class="ico" data-icon="gear"></span>
+        <span class="label">Settings</span>
+      </button>
+      <div class="conn-status" id="conn-status" title="Storage box connection">
+        <span class="dot"></span><span class="text">Connecting…</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="stage">
+    <header class="stage-head" data-tauri-drag-region>
+      <div class="crumbs" id="crumbs" data-tauri-drag-region></div>
+      <div class="head-row" data-tauri-drag-region>
+        <h1 id="title" data-tauri-drag-region></h1>
+        <div class="toolbar" id="toolbar"></div>
+      </div>
+    </header>
+
+    <section class="view" id="view"></section>
+
+    <div class="selection-bar" id="selection-bar" hidden></div>
+  </main>
+
+  <footer class="transport" id="transport">
+    <button class="transport-scope" id="open-transfers" type="button" aria-label="Open transfers">
+      <canvas id="scope"></canvas>
+      <span class="scope-label">signal · 60s</span>
+    </button>
+    <div class="readout up">
+      <span class="dir">▲ to vault</span>
+      <span class="num"><b id="up-num">0.0</b><small id="up-unit">MB/s</small></span>
+    </div>
+    <div class="readout down">
+      <span class="dir">▼ to Mac</span>
+      <span class="num"><b id="down-num">0.0</b><small id="down-unit">MB/s</small></span>
+    </div>
+    <div class="readout eta">
+      <span class="dir">remaining</span>
+      <span class="num tc" id="eta">--:--:--</span>
+    </div>
+    <div class="readout queue">
+      <span class="dir" id="queue-label">idle</span>
+      <span class="num small" id="remaining">—</span>
+    </div>
+    <div class="lamps" id="lamps" title="SSH connections in use"></div>
+    <button class="transport-btn" id="toggle-all" type="button" aria-label="Pause all transfers"></button>
+  </footer>
+
+  <div class="drop-veil" id="drop-veil" hidden>
+    <div class="drop-card">
+      <svg class="mark live" viewBox="0 0 24 24" aria-hidden="true"><path class="m3" d="M8 8.6 12 5l4 3.6"/><rect class="m2" x="6.5" y="11.6" width="11" height="3.4" rx="1.4"/><rect class="m1" x="3.5" y="17.4" width="17" height="3.4" rx="1.4"/></svg>
+      <h2>Drop to send to the vault</h2>
+      <p id="drop-hint">Files keep their folder structure under their library.</p>
+      <div class="drop-modes">You'll choose whether to keep or free the local copy.</div>
+    </div>
+  </div>
+
+  <div class="modal" id="modal" hidden></div>
+  <div class="toasts" id="toasts"></div>
+</body>
+</html>

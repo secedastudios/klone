@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Klone</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="popover.js"></script>
+</head>
+<body class="popover">
+  <div class="pop">
+    <header class="pop-head">
+      <div class="brand"><svg class="mark" viewBox="0 0 24 24" aria-hidden="true"><path class="m3" d="M8 8.6 12 5l4 3.6"/><rect class="m2" x="6.5" y="11.6" width="11" height="3.4" rx="1.4"/><rect class="m1" x="3.5" y="17.4" width="17" height="3.4" rx="1.4"/></svg><span class="word">klone</span></div>
+      <span class="spacer"></span>
+      <span class="state" id="p-state">idle</span>
+    </header>
+    <div class="pop-meter">
+      <div class="readout up"><span class="dir">▲ to vault</span><span class="num"><b id="p-up">0.0</b><small id="p-up-u">MB/s</small></span></div>
+      <div class="readout down"><span class="dir">▼ to Mac</span><span class="num"><b id="p-down">0.0</b><small id="p-down-u">MB/s</small></span></div>
+    </div>
+    <div class="pop-scope"><canvas id="p-scope"></canvas></div>
+    <div class="pop-sum"><span id="p-left">—</span><span>ETA <b id="p-eta">--:--:--</b></span></div>
+    <div class="pop-list" id="p-list"></div>
+    <footer class="pop-foot">
+      <button class="btn primary" id="p-open" type="button">Open Klone</button>
+      <button class="btn icon-only" id="p-toggle" type="button"></button>
+      <span class="spacer"></span>
+      <button class="btn ghost icon-only" id="p-quit" type="button" title="Quit Klone"></button>
+    </footer>
+  </div>
+</body>
+</html>

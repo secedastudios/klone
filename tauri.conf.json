@@ -1,0 +1,71 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Klone",
+  "identifier": "ltd.marin.klone",
+  "build": {
+    "frontendDist": "ui"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "label": "main",
+        "title": "Klone",
+        "url": "index.html",
+        "width": 1280,
+        "height": 820,
+        "minWidth": 980,
+        "minHeight": 620,
+        "titleBarStyle": "Overlay",
+        "hiddenTitle": true,
+        "backgroundColor": "#0b0e14",
+        "dragDropEnabled": true
+      },
+      {
+        "label": "popover",
+        "title": "Klone",
+        "url": "popover.html",
+        "width": 380,
+        "height": 480,
+        "visible": false,
+        "decorations": false,
+        "transparent": true,
+        "resizable": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "shadow": true
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; font-src 'self'; script-src 'self'"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "app",
+      "dmg"
+    ],
+    "category": "public.app-category.video",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns"
+    ],
+    "macOS": {
+      "minimumSystemVersion": "12.0",
+      "signingIdentity": "-"
+    },
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDA0RjE4OUM5MzRFNjk5NjcKUldSbm1lWTB5WW54QktmSUVxTVl3RlptdVZIdFZHeWtZckw0cy9nR0tKeUxsbFdzUHNXUnV6aEIK",
+      "endpoints": [
+        "https://github.com/secedastudios/klone/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}
