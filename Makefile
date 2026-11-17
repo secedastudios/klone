@@ -4,7 +4,7 @@
 #   make universal build a universal (Apple Silicon + Intel) .dmg
 #   make install   build, quit the running Klone, replace /Applications/Klone.app, relaunch
 #   make bump      bump the patch version (or: make bump PART=minor|major, make bump V=1.2.3)
-#   make release   build, sign and publish a GitHub release (installed apps auto-update)
+#   make release   tag and push v<version>; GitHub Actions publishes it (installed apps auto-update)
 #   make dev       run in development mode
 #   make test      unit tests
 
@@ -27,7 +27,7 @@ TAURI_FLAGS := --config '{"bundle":{"createUpdaterArtifacts":false}}'
 endif
 INSTALLED   := $(INSTALL_DIR)/$(APP_NAME).app
 
-.PHONY: release bump version build app dmg universal universal-app install uninstall dev test clean
+.PHONY: release release-local bump version build app dmg universal universal-app install uninstall dev test clean
 
 version:
 	@echo $(VERSION)
@@ -42,8 +42,13 @@ bump:
 	cargo update -p klone --offline -q 2>/dev/null || cargo metadata -q --format-version 1 >/dev/null; \
 	echo "$(VERSION) -> $$new"
 
+# Tag v<version> and push it; GitHub Actions builds and publishes.
 release:
-	UPDATER_KEY="$(UPDATER_KEY)" scripts/release.sh
+	scripts/release.sh tag
+
+# Fallback: build, sign and publish from this Mac with ~/.tauri/klone.key.
+release-local:
+	UPDATER_KEY="$(UPDATER_KEY)" scripts/release.sh publish
 
 build:
 	cargo tauri build $(TAURI_FLAGS)
