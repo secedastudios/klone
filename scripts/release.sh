@@ -7,7 +7,7 @@
 #   scripts/release.sh publish   build a signed universal app and publish the
 #                                GitHub release for the current version. Run
 #                                by CI; `make release-local` runs it here as a
-#                                fallback, using ~/.tauri/klone.key.
+#                                fallback, using .secrets/klone.key (or ~/.tauri/klone.key).
 #
 # NOTES="…" overrides the release notes (default: commit subjects since the
 # previous tag).
@@ -36,7 +36,8 @@ tag() {
 
 publish() {
   if [ -z "${TAURI_SIGNING_PRIVATE_KEY:-}" ]; then
-    KEY="${UPDATER_KEY:-$HOME/.tauri/klone.key}"
+    KEY="${UPDATER_KEY:-}"
+    [ -n "$KEY" ] || for k in .secrets/klone.key "$HOME/.tauri/klone.key"; do [ -f "$k" ] && KEY="$k" && break; done
     [ -f "$KEY" ] || die "no updater signing key (TAURI_SIGNING_PRIVATE_KEY or $KEY)"
     export TAURI_SIGNING_PRIVATE_KEY="$(cat "$KEY")"
   fi

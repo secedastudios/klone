@@ -59,7 +59,7 @@ make release                    # tags v<version> and pushes the tag
 
 Pushing the tag starts the **Release** workflow (`.github/workflows/release.yml`). It runs the tests on a GitHub macOS runner, builds a universal app, signs the update archive, and publishes a GitHub release with the .dmg, the update archive and `latest.json`. Installed copies find it through `https://github.com/secedastudios/klone/releases/latest/download/latest.json`.
 
-The workflow signs with the repository secret `TAURI_SIGNING_PRIVATE_KEY`, which holds the contents of `~/.tauri/klone.key`. `make release-local` does the same build and publish from your Mac, if CI is unavailable.
+The workflow signs with the repository secret `TAURI_SIGNING_PRIVATE_KEY`, which holds the contents of `~/.tauri/klone.key`. `make release-local` does the same build and publish from your Mac, if CI is unavailable. Locally the key is read from `.secrets/klone.key` in the project (gitignored), or `~/.tauri/klone.key`.
 
 **Keep `~/.tauri/klone.key` safe and backed up.** Installed copies only accept updates signed with it, so if it's lost they can't be updated and everyone has to reinstall by hand. Never commit it. Without the key, the other `make` targets still build; they just skip the update archive.
 

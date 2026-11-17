@@ -2,3 +2,7 @@
 /gen
 .DS_Store
 /dist
+
+# Local secrets (updater signing key) — never commit
+/.secrets/
+*.key

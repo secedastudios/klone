@@ -17,7 +17,8 @@ VERSION     := $(shell sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
 PART        ?= patch
 
 # Updater signing key. Without it, builds skip the update archive.
-UPDATER_KEY ?= $(HOME)/.tauri/klone.key
+# Looked for in .secrets/ (gitignored) first, then ~/.tauri/.
+UPDATER_KEY ?= $(firstword $(wildcard .secrets/klone.key $(HOME)/.tauri/klone.key) .secrets/klone.key)
 ifneq ($(wildcard $(UPDATER_KEY)),)
 export TAURI_SIGNING_PRIVATE_KEY := $(shell cat "$(UPDATER_KEY)")
 export TAURI_SIGNING_PRIVATE_KEY_PASSWORD ?=
